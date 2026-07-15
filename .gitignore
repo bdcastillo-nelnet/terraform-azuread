@@ -1,4 +1,4 @@
-# Terraform state — never commit (environment-specific, can contain secrets)
+# Terraform state — never commit (can contain secrets)
 *.tfstate
 *.tfstate.*
 
@@ -9,11 +9,10 @@
 crash.log
 crash.*.log
 
-# Secrets and local-only overrides — never commit.
-# Non-secret environment CONFIG is committed via *.auto.tfvars instead.
+# Secrets & local-only overrides — never commit.
+# Non-secret per-environment config is committed under vars/*.tfvars instead.
 terraform.tfvars
 *.secret.tfvars
-secrets.auto.tfvars
 
 # CLI config that can hold credentials
 *.tfrc
