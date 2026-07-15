@@ -1,4 +1,9 @@
 variable "tenant_id" {
-  description = "The Azure AD (Entra ID) tenant ID to manage. Get it with: az account show --query tenantId -o tsv"
+  description = "Azure AD (Entra ID) tenant ID for the selected environment."
+  type        = string
+}
+
+variable "environment" {
+  description = "Environment name (e.g. sandbox, prod). Used for naming/tagging."
   type        = string
 }

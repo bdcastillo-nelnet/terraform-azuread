@@ -1,15 +1,20 @@
-# Terraform
-**/.terraform/*
+# Terraform state — never commit (can contain secrets)
 *.tfstate
 *.tfstate.*
+
+# Provider plugins & local working files from `terraform init`
+**/.terraform/*
+
+# Crash logs
 crash.log
 crash.*.log
 
-# Variable files (may contain secrets); keep the shareable template
-*.tfvars
-*.tfvars.json
-!*.tfvars.example
+# Secrets & local-only overrides — never commit.
+# Non-secret per-environment config is committed under vars/*.tfvars instead.
+terraform.tfvars
+*.secret.tfvars
 
+# CLI config that can hold credentials
 *.tfrc
 .terraformrc
 

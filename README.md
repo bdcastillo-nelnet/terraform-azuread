@@ -2,7 +2,7 @@
 
 Terraform configuration for managing **Azure AD (Microsoft Entra ID)** with the
 [`azuread`](https://registry.terraform.io/providers/hashicorp/azuread/latest) provider.
-Sandbox / learning project — tracked in Jira **NN-15153**.
+Learning project — tracked in Jira **NN-15153**.
 
 ## What this manages
 
@@ -16,53 +16,62 @@ the separate `azurerm` provider.
 
 - Terraform >= 1.5
 - Azure CLI (`az`)
-- Access to an Azure AD **sandbox** tenant (never run this against production)
+- Access to the relevant Azure AD tenant
 
 ## Repository layout
 
 ```
 terraform-azuread/
-├─ README.md          # this file (describes the whole repo)
-├─ .gitignore         # keeps state files and secrets out of git
-└─ identity/          # Terraform root module — run all commands from here
-   ├─ providers.tf              # Terraform + provider version pins and provider config
-   ├─ variables.tf              # input variables (the module's "arguments")
-   ├─ main.tf                   # resources and data sources
-   ├─ outputs.tf                # values printed after `apply`
-   └─ terraform.tfvars.example  # template — copy to terraform.tfvars and fill in
+├─ README.md
+├─ .gitignore
+├─ providers.tf     # Terraform + provider version pins, provider config
+├─ variables.tf     # input variables
+├─ main.tf          # resources & data sources
+├─ outputs.tf       # values printed after apply
+└─ vars/            # one file of values per environment (committed; no secrets)
+   ├─ sandbox.tfvars
+   └─ prod.tfvars   # placeholder until the prod tenant is known
 ```
 
-Terraform loads *all* `.tf` files in the directory it runs in, so the file
-names inside `identity/` are a human convention, not a requirement. The
-`identity/` folder itself is the "root module" — the directory you run
-Terraform from.
+A single configuration is reused for every environment; the environment is
+selected at run time by passing the matching var file.
+
+## Variables & secrets convention
+
+- **Committed:** `vars/*.tfvars` hold non-secret, per-environment *config*
+  (tenant ID, environment name). Committing them makes each environment fully
+  described in the repo.
+- **Never committed:** secrets. They come from `az login`, `TF_VAR_*`
+  environment variables, or a secrets store — never from a tfvars file.
+  `.gitignore` blocks `terraform.tfvars`, `*.secret.tfvars`, and state files.
 
 ## Getting started
 
 ```bash
-# 1. Log in to your sandbox tenant
-az login --tenant <your-tenant-id>
+az login --tenant <tenant-id>                    # authenticate
 
-# 2. Enter the module
-cd identity
-
-# 3. Provide your tenant ID
-cp terraform.tfvars.example terraform.tfvars
-#   then edit terraform.tfvars
-
-# 4. Initialize (downloads the azuread provider)
-terraform init
-
-# 5. Preview changes — ALWAYS read this before applying
-terraform plan
-
-# 6. Apply
-terraform apply
+terraform init                                   # download provider
+terraform plan  -var-file=vars/sandbox.tfvars    # preview — ALWAYS read first
+terraform apply -var-file=vars/sandbox.tfvars    # make it so
 ```
+
+Because the var files are not named `terraform.tfvars`, they are **not** loaded
+automatically — you must pass `-var-file` on every `plan`/`apply`. That is
+deliberate: it forces you to state which environment you are targeting.
+
+## State isolation (important, and not done yet)
+
+Right now a single local state file is shared across environments. That is fine
+while **sandbox is the only real tenant**. Before a second environment (prod)
+goes live, state MUST be isolated per environment, via either:
+
+- **Terraform workspaces** — `terraform workspace new sandbox` / `prod`, or
+- **Per-environment remote backend keys** (see NN-15163).
+
+Until then, only run against the sandbox var file.
 
 ## Safety rules
 
-- **Sandbox only.** Do not point this at production.
-- **Always** review `terraform plan` output before `terraform apply`.
-- `terraform.tfvars` and `*.tfstate` are git-ignored — never commit secrets.
-- Commit `.terraform.lock.hcl` so the whole team uses identical provider versions.
+- **Always** pass the correct `-var-file` and review `terraform plan` before `apply`.
+- Secrets never go in tfvars. State files are git-ignored.
+- Commit `.terraform.lock.hcl` so provider versions are pinned for everyone.
