@@ -1,0 +1,31 @@
+# .gitignore for Terraform
+# ------------------------------------------------------------------------------
+# Some Terraform files must NEVER be committed: state (can contain secrets and
+# is environment-specific) and any tfvars holding sensitive input.
+# ------------------------------------------------------------------------------
+
+# Provider plugins & local working files downloaded by `terraform init`
+**/.terraform/*
+
+# State files — the source of truth mapping config to real objects.
+# Can contain secrets; belongs in a remote backend, never in git.
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Variable files — may contain tenant IDs / secrets.
+# Ignore all *.tfvars EXCEPT the shareable *.example template.
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# CLI config that can hold credentials
+*.tfrc
+.terraformrc
+
+# NOTE: .terraform.lock.hcl is deliberately NOT ignored.
+# That lock file pins exact provider versions/hashes and SHOULD be committed
+# so everyone on the team resolves identical providers.

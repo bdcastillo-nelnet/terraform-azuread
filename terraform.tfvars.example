@@ -1,0 +1,11 @@
+# terraform.tfvars.example
+# ------------------------------------------------------------------------------
+# Template for your LOCAL variable values.
+# Copy this to `terraform.tfvars` (which is git-ignored) and fill in real values:
+#
+#     cp terraform.tfvars.example terraform.tfvars
+#
+# Terraform automatically loads a file named exactly `terraform.tfvars`.
+# ------------------------------------------------------------------------------
+
+tenant_id = "00000000-0000-0000-0000-000000000000"
