@@ -20,17 +20,22 @@ the separate `azurerm` provider.
 
 ## Repository layout
 
-| File | Purpose |
-|------|---------|
-| `providers.tf` | Terraform + provider version pins and provider config |
-| `variables.tf` | Input variables (the project's "arguments") |
-| `main.tf` | Resources and data sources |
-| `outputs.tf` | Values printed after `apply` |
-| `terraform.tfvars.example` | Template — copy to `terraform.tfvars` and fill in |
-| `.gitignore` | Keeps state files and secrets out of git |
+```
+terraform-azuread/
+├─ README.md          # this file (describes the whole repo)
+├─ .gitignore         # keeps state files and secrets out of git
+└─ identity/          # Terraform root module — run all commands from here
+   ├─ providers.tf              # Terraform + provider version pins and provider config
+   ├─ variables.tf              # input variables (the module's "arguments")
+   ├─ main.tf                   # resources and data sources
+   ├─ outputs.tf                # values printed after `apply`
+   └─ terraform.tfvars.example  # template — copy to terraform.tfvars and fill in
+```
 
-Terraform loads *all* `.tf` files in this directory, so these names are a
-human convention, not a requirement.
+Terraform loads *all* `.tf` files in the directory it runs in, so the file
+names inside `identity/` are a human convention, not a requirement. The
+`identity/` folder itself is the "root module" — the directory you run
+Terraform from.
 
 ## Getting started
 
@@ -38,17 +43,20 @@ human convention, not a requirement.
 # 1. Log in to your sandbox tenant
 az login --tenant <your-tenant-id>
 
-# 2. Provide your tenant ID
+# 2. Enter the module
+cd identity
+
+# 3. Provide your tenant ID
 cp terraform.tfvars.example terraform.tfvars
 #   then edit terraform.tfvars
 
-# 3. Initialize (downloads the azuread provider)
+# 4. Initialize (downloads the azuread provider)
 terraform init
 
-# 4. Preview changes — ALWAYS read this before applying
+# 5. Preview changes — ALWAYS read this before applying
 terraform plan
 
-# 5. Apply
+# 6. Apply
 terraform apply
 ```
 
