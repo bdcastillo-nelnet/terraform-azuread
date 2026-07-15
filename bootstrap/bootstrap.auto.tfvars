@@ -1,0 +1,5 @@
+tenant_id                  = "8d829838-f962-4a9d-9cad-2281e437b7d9"
+subscription_id            = "886fc591-eb36-4c66-a0be-6f3a39f2bda6"
+github_repository          = "bdcastillo-nelnet/terraform-azuread"
+state_resource_group_name  = "rg-terraform-state-sbx"
+state_storage_account_name = "sttfstatesbx25909"

@@ -1,0 +1,39 @@
+name: terraform-apply
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "identity/**"
+      - "modules/**"
+      - "vars/**"
+      - ".github/workflows/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    # A GitHub Environment with required reviewers turns this into a manual
+    # approval gate before anything is applied.
+    environment: sandbox
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_USE_AZUREAD_AUTH: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: identity
+        run: terraform init -backend-config=../vars/sandbox.backend.hcl
+
+      - name: Terraform Apply
+        working-directory: identity
+        run: terraform apply -auto-approve -var-file=../vars/sandbox.tfvars

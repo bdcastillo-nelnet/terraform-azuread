@@ -1,0 +1,38 @@
+name: terraform-plan
+
+on:
+  pull_request:
+    paths:
+      - "identity/**"
+      - "modules/**"
+      - "vars/**"
+      - ".github/workflows/**"
+
+# OIDC: id-token lets the runner request a short-lived token to exchange for an
+# Azure token. No client secret is stored anywhere.
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_USE_AZUREAD_AUTH: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: identity
+        run: terraform init -backend-config=../vars/sandbox.backend.hcl
+
+      - name: Terraform Plan
+        working-directory: identity
+        run: terraform plan -var-file=../vars/sandbox.tfvars

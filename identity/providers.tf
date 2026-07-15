@@ -1,6 +1,12 @@
 terraform {
   required_version = ">= 1.5"
 
+  # State lives in Azure Storage. Per-environment values are supplied at init
+  # via -backend-config (see vars/<env>.backend.hcl).
+  backend "azurerm" {
+
+  }
+
   required_providers {
     azuread = {
       source  = "hashicorp/azuread"
