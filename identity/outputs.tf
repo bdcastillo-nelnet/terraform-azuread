@@ -12,3 +12,8 @@ output "authenticated_object_id" {
   description = "Object ID of the identity Terraform is running as."
   value       = data.azuread_client_config.current.object_id
 }
+
+output "users" {
+  description = "Users managed from users.csv, keyed by username."
+  value       = module.users.users
+}

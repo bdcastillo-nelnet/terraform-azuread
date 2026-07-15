@@ -7,3 +7,6 @@ variable "environment" {
   description = "Environment name (e.g. sandbox, prod). Used for naming/tagging."
   type        = string
 }
+
+
+
